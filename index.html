@@ -170,6 +170,22 @@ textarea{font-family:var(--mono);font-size:13px;line-height:1.7;resize:vertical}
 .pts-fila:last-child{border-bottom:0}
 .pts-fila b{flex:1;font-weight:500;color:var(--cream)}
 .pts-fila span{color:var(--muted);font-family:var(--mono);font-size:11.5px;text-align:right}
+.pts-ej{margin-top:14px;padding:12px 14px;border-radius:var(--r-s);
+  background:rgba(232,192,122,.1);border:1px solid rgba(232,192,122,.28);
+  font-size:13.5px;color:var(--cream);line-height:1.5}
+.pts-ej b{color:var(--gold)}
+
+/* ---------- panel deslizante ---------- */
+.sheet-bg{position:fixed;inset:0;z-index:70;background:rgba(18,7,13,.74);
+  display:flex;align-items:flex-end;justify-content:center;animation:aparece .2s ease}
+@keyframes aparece{from{opacity:0}to{opacity:1}}
+.sheet{width:100%;max-width:560px;background:var(--ink-2);
+  border-radius:24px 24px 0 0;border-top:1px solid var(--line-strong);
+  box-shadow:0 -20px 50px -20px rgba(0,0,0,.9);
+  padding:12px 20px 24px;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));
+  max-height:86vh;overflow-y:auto;animation:sube .3s cubic-bezier(.3,1.05,.4,1)}
+@keyframes sube{from{transform:translateY(100%)}to{transform:none}}
+.sheet-asa{width:42px;height:4px;border-radius:99px;background:var(--line-strong);margin:0 auto 16px}
 
 /* ---------- widgets ---------- */
 .cal{width:100%;max-width:330px;display:flex;flex-direction:column;gap:9px}
@@ -405,11 +421,7 @@ textarea{font-family:var(--mono);font-size:13px;line-height:1.7;resize:vertical}
     </div>
   </div>
 
-  <div>
-    <h3 style="font-size:19px">Los puntos</h3>
-    <p class="note" style="margin:6px 0 14px">Cada apuesta vale <b>100</b>. Se suman las nueve: <b>900</b> en total.</p>
-    <div id="ptsList"></div>
-  </div>
+  <button class="btn btn-ghost" id="btnPuntaje">Cómo se puntúa</button>
 </section>
 
 <!-- ============ PODIO PÚBLICO ============ -->
@@ -467,6 +479,32 @@ textarea{font-family:var(--mono);font-size:13px;line-height:1.7;resize:vertical}
   </div>
 </section>
 
+</div>
+
+<!-- ============ CÓMO SE PUNTÚA ============ -->
+<div class="sheet-bg" id="sheetPts" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTit">
+    <div class="sheet-asa"></div>
+    <h3 id="sheetTit" style="font-size:22px">Cómo se puntúa</h3>
+    <p class="note" style="margin:8px 0 18px">
+      Cada apuesta vale <b>100</b>. Si acertás justo, te los llevás todos.
+      Cuanto más te alejás, menos.
+    </p>
+
+    <p class="pts-grupo">Llegás a 0 si te alejás</p>
+    <div id="ptsCerca"></div>
+
+    <p class="pts-ej">
+      Dijiste el <b>20</b> y nace el <b>22</b>: te alejaste 2 de 9 días,
+      así que te llevás <b>78</b> de los 100.
+    </p>
+
+    <p class="pts-grupo">Acá no hay medias tintas</p>
+    <div id="ptsExacto"></div>
+
+    <p class="note" style="margin-top:18px">Las nueve juntas suman <b>900</b>.</p>
+    <button class="btn" id="btnSheetClose" style="margin-top:18px">Entendido</button>
+  </div>
 </div>
 
 <script>
@@ -591,7 +629,10 @@ var Q = [
   init:function(){ return DUE; },
   label:function(v){ return dstr(v); },
   short:function(v){ return dstr(v); },
-  score:function(g,r){ return Math.max(0,100-12*Math.abs(dayDiff(g,r))); },
+  // Misma forma que las demas de cercania: 100 justo, 0 al llegar al margen.
+  // Antes restaba 12 por dia, que daba 4 puntos a los 8 dias y rompia la regla
+  // unica que la pantalla de puntaje explica.
+  score:function(g,r){ return Math.max(0,Math.round(100*(1-Math.abs(dayDiff(g,r))/9))); },
   build:function(stage,get,set){
     var mi=Math.max(0,CAL_MONTHS.indexOf(get().slice(0,7)));
     var cal=el("div","cal"), head=el("div","cal-head");
@@ -965,22 +1006,21 @@ var Q = [
 ];
 var TOTAL_MAX = Q.length*100;
 
-// En castellano lo que las funciones score() hacen con numeros. Si cambia una
-// formula, cambia tambien el renglon de al lado: los lee la gente que apuesta.
-var PUNTOS = [
-  { grupo:"Cuanto más cerca, más puntos", filas:[
-    ["Día",              "−12 por día"],
-    ["Hora",             "cero a las 6 h"],
-    ["Peso",             "cero a los 900 g"],
-    ["Altura",           "cero a los 9 cm"],
-    ["Pie",              "cero a 1,5 cm"],
-    ["Trabajo de parto", "cero a las 12 h"]
-  ]},
-  { grupo:"O acertás o no", filas:[
-    ["Ojos",            "100 o nada"],
-    ["Parto",           "100 o nada"],
-    ["Grupo sanguíneo", "45 si acertás solo el grupo"]
-  ]}
+// El margen de cada apuesta de cercania: la diferencia con la que el puntaje
+// toca cero. Entre acertar justo y ese margen, baja parejo. Si cambia una
+// funcion score(), cambia tambien el numero de al lado: lo lee la gente.
+var PUNTOS_CERCA = [
+  ["Día",              "9 días"],
+  ["Hora",             "6 horas"],
+  ["Peso",             "900 gramos"],
+  ["Altura",           "9 cm"],
+  ["Pie",              "1,5 cm"],
+  ["Trabajo de parto", "12 horas"]
+];
+var PUNTOS_EXACTO = [
+  ["Ojos",            "100 o 0"],
+  ["Parto",           "100 o 0"],
+  ["Grupo sanguíneo", "100 justo · 45 el grupo"]
 ];
 
 function scoreBet(resp, real){
@@ -1264,20 +1304,35 @@ function pintarBoleta(){
     body.appendChild(row);
   });
 
-  var lista=$("ptsList"); lista.innerHTML="";
-  PUNTOS.forEach(function(g){
-    lista.appendChild(el("p","pts-grupo",g.grupo));
-    g.filas.forEach(function(f){
-      var fila=el("div","pts-fila");
-      fila.appendChild(el("b","",f[0]));
-      fila.appendChild(el("span","",f[1]));
-      lista.appendChild(fila);
-    });
-  });
 }
 
 $("btnVerBoleta").addEventListener("click",function(){ show("s-boleta"); });
 $("btnBoletaBack").addEventListener("click",function(){ show("s-done"); });
+
+/* ---------- panel de puntaje ---------- */
+(function(){
+  function filas(host,datos){
+    datos.forEach(function(f){
+      var fila=el("div","pts-fila");
+      fila.appendChild(el("b","",f[0]));
+      fila.appendChild(el("span","",f[1]));
+      host.appendChild(fila);
+    });
+  }
+  filas($("ptsCerca"),PUNTOS_CERCA);
+  filas($("ptsExacto"),PUNTOS_EXACTO);
+
+  function abrir(){ $("sheetPts").hidden=false; $("btnSheetClose").focus(); }
+  function cerrar(){ $("sheetPts").hidden=true; $("btnPuntaje").focus(); }
+
+  $("btnPuntaje").addEventListener("click",abrir);
+  $("btnSheetClose").addEventListener("click",cerrar);
+  // Tocar el fondo cierra; tocar el panel no.
+  $("sheetPts").addEventListener("click",function(e){ if(e.target===$("sheetPts")) cerrar(); });
+  document.addEventListener("keydown",function(e){
+    if(e.key==="Escape" && !$("sheetPts").hidden) cerrar();
+  });
+})();
 
 $("btnShare").addEventListener("click",function(){
   var url=location.origin+location.pathname;
