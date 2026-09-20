@@ -1503,10 +1503,11 @@ function pintarTopHost(){
 
 /* ===================== arranque ===================== */
 function olvidarApuesta(){
-  lsDel(LS_MINE); lsDel(LS_DRAFT);
   me={ nombre:"", parentesco:"", a:{}, secreto:"" };
   $("regName").value=""; $("regRel").value="";
   checkReg();
+  // checkReg() vuelve a escribir el borrador, asi que se borra despues de el.
+  lsDel(LS_MINE); lsDel(LS_DRAFT);
 }
 
 function portada(j){
