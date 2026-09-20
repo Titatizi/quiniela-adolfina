@@ -162,12 +162,14 @@ textarea{font-family:var(--mono);font-size:13px;line-height:1.7;resize:vertical}
 .tk-foot b{color:#2B1220}
 
 /* ---------- como se puntua ---------- */
-.pts-item{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13.5px}
-.pts-item:last-child{border-bottom:0}
-.pts-item b{font-family:var(--mono);color:var(--gold);font-size:11.5px;flex:0 0 54px}
-.pts-item div{flex:1;min-width:0}
-.pts-item i{display:block;font-style:normal;color:var(--cream);font-weight:500}
-.pts-item span{color:var(--muted);font-size:12.5px}
+.pts-grupo{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold);margin:16px 0 2px}
+.pts-grupo:first-child{margin-top:0}
+.pts-fila{display:flex;align-items:baseline;gap:12px;padding:7px 0;
+  border-bottom:1px solid var(--line);font-size:14px}
+.pts-fila:last-child{border-bottom:0}
+.pts-fila b{flex:1;font-weight:500;color:var(--cream)}
+.pts-fila span{color:var(--muted);font-family:var(--mono);font-size:11.5px;text-align:right}
 
 /* ---------- widgets ---------- */
 .cal{width:100%;max-width:330px;display:flex;flex-direction:column;gap:9px}
@@ -327,9 +329,9 @@ textarea{font-family:var(--mono);font-size:13px;line-height:1.7;resize:vertical}
 <section class="screen" id="s-cover" hidden>
   <div class="cover">
     <div class="envelope">
-      <p class="eyebrow">Baby shower · Se juega en familia</p>
+      <p class="eyebrow">Baby shower</p>
       <h1 class="cover-name">Adolfina</h1>
-      <p class="cover-sub">Todavía no nació, pero vos ya podés apostar. Nueve apuestas, un solo ganador.</p>
+      <p class="cover-sub">Nueve apuestas. Un solo ganador.</p>
       <button class="seal" id="btnOpen" aria-label="Abrir la invitación">Abrir<br>invitación</button>
     </div>
     <p class="note" style="text-align:center" id="coverCount"></p>
@@ -339,9 +341,8 @@ textarea{font-family:var(--mono);font-size:13px;line-height:1.7;resize:vertical}
 <!-- ============ REGISTRO ============ -->
 <section class="screen" id="s-register" hidden>
   <div>
-    <p class="eyebrow">Antes de empezar</p>
     <h2 class="card-title" style="font-size:clamp(26px,7.4vw,34px)">¿Quién sos?</h2>
-    <p class="lede" style="margin-top:8px">Sin esto no podemos avisarte si ganaste.</p>
+    <p class="lede" style="margin-top:8px">Para avisarte si ganás.</p>
   </div>
   <div class="card-box field">
     <label for="regName">Tu nombre</label>
@@ -352,7 +353,7 @@ textarea{font-family:var(--mono);font-size:13px;line-height:1.7;resize:vertical}
     <input type="text" id="regRel" maxlength="40">
   </div>
   <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px">
-    <p class="note" id="regNote">Completá los dos campos para seguir.</p>
+    <p class="note" id="regNote"></p>
     <button class="btn" id="btnToDeck" disabled>Empezar a apostar</button>
   </div>
 </section>
@@ -405,11 +406,8 @@ textarea{font-family:var(--mono);font-size:13px;line-height:1.7;resize:vertical}
   </div>
 
   <div>
-    <h3 style="font-size:19px">Cómo se cuentan los puntos</h3>
-    <p class="note" style="margin:6px 0 4px">
-      Cada apuesta vale <b>hasta 100</b>. No hace falta acertar justo: cuanto más
-      cerca estés, más puntos te llevás. Al final se suman las nueve.
-    </p>
+    <h3 style="font-size:19px">Los puntos</h3>
+    <p class="note" style="margin:6px 0 14px">Cada apuesta vale <b>100</b>. Se suman las nueve: <b>900</b> en total.</p>
     <div id="ptsList"></div>
   </div>
 </section>
@@ -447,14 +445,14 @@ textarea{font-family:var(--mono);font-size:13px;line-height:1.7;resize:vertical}
       <label>Link para invitar</label>
       <div class="code" id="guestLink"></div>
       <button class="btn btn-ghost" id="btnCopyLink">Copiar el link de invitación</button>
-      <p class="note">Este es el que mandás por WhatsApp. <b>No compartas el link que tenés abierto ahora</b> — ese tiene tu clave de organizadora.</p>
+      <p class="note"><b>No compartas el link que tenés abierto</b>: ese lleva tu clave.</p>
     </div>
   </div>
 
   <div id="paneReal" hidden style="display:flex;flex-direction:column;gap:16px">
     <div>
       <h3 style="font-size:20px">Cómo fue en serio</h3>
-      <p class="lede" style="margin-top:6px">Cargá los datos reales de Adolfina cuando nazca. Se juega igual que las apuestas.</p>
+      <p class="lede" style="margin-top:6px">Cargalos cuando nazca. Se juega igual.</p>
     </div>
     <button class="btn" id="btnLoadReal">Cargar los datos reales</button>
     <div id="realSummary"></div>
@@ -589,7 +587,7 @@ function dragTrack(node,o){
 var Q = [
 {
   id:"fecha", title:"¿Qué día nace?",
-  sub:"La fecha probable es el 20 de diciembre. Pero los bebés no leen el calendario.",
+  sub:"La fecha probable es el 20 de diciembre.",
   init:function(){ return DUE; },
   label:function(v){ return dstr(v); },
   short:function(v){ return dstr(v); },
@@ -629,7 +627,7 @@ var Q = [
 },
 {
   id:"hora", title:"¿A qué hora?",
-  sub:"Arrastrá el sol alrededor del reloj. Da la vuelta completa: son 24 horas.",
+  sub:"Arrastrá el sol. Son 24 horas.",
   init:function(){ return 8*60; },
   label:function(v){ return hhmm(v)+" hs"; },
   short:function(v){ return hhmm(v)+" hs"; },
@@ -711,7 +709,7 @@ var Q = [
 },
 {
   id:"peso", title:"¿Cuánto va a pesar?",
-  sub:"Arrastrá la balanza hacia la izquierda para subir de peso.",
+  sub:"Arrastrá la balanza.",
   init:function(){ return 3200; },
   label:function(v){ return (v/1000).toFixed(3).replace(".",",")+" kg"; },
   short:function(v){ return (v/1000).toFixed(3).replace(".",",")+" kg"; },
@@ -734,7 +732,7 @@ var Q = [
 },
 {
   id:"ojos", title:"¿De qué color los ojos?",
-  sub:"Tocá los ojos para ir cambiando de color.",
+  sub:"Tocá para cambiar.",
   init:function(){ return 0; },
   label:function(v){ return OJOS[v]; },
   short:function(v){ return OJOS[v]; },
@@ -771,7 +769,7 @@ var Q = [
     function draw(){
       var c=OJOS_C[get()];
       i1.setAttribute("fill",c); i2.setAttribute("fill",c);
-      nm.textContent="Tocá para cambiar · "+(get()+1)+" de "+OJOS.length;
+      nm.textContent=(get()+1)+" de "+OJOS.length;
     }
     btn.addEventListener("click",function(){ set((get()+1)%OJOS.length); draw(); });
     draw();
@@ -779,7 +777,7 @@ var Q = [
 },
 {
   id:"altura", title:"¿Cuánto va a medir?",
-  sub:"Estirá la cinta métrica hacia arriba y la beba crece.",
+  sub:"Estirá la cinta.",
   init:function(){ return 49; },
   label:function(v){ return v+" cm"; },
   short:function(v){ return v+" cm"; },
@@ -809,7 +807,6 @@ var Q = [
     baby.appendChild(bs);
     tape.appendChild(track); tape.appendChild(baby);
     stage.appendChild(tape);
-    stage.appendChild(el("p","hintline","Arrastrá para arriba o para abajo"));
     function draw(){
       var t=(get()-MIN)/(MAX-MIN);
       fill.style.height=(12+t*88)+"%";
@@ -821,7 +818,7 @@ var Q = [
 },
 {
   id:"parto", title:"¿Parto natural o cesárea?",
-  sub:"Elegí una de las dos puertas.",
+  sub:"Elegí una.",
   init:function(){ return 0; },
   label:function(v){ return PARTO[v]; },
   short:function(v){ return PARTO[v]; },
@@ -837,14 +834,13 @@ var Q = [
       wrap.appendChild(b); return b;
     });
     stage.appendChild(wrap);
-    stage.appendChild(el("p","hintline","Tocá la que creas"));
     function draw(){ btns.forEach(function(b,i){ b.setAttribute("aria-pressed",String(i===get())); }); }
     draw();
   }
 },
 {
   id:"pie", title:"¿Cuánto le va a medir el pie?",
-  sub:"Agarrá el puntito rosa y estirá la huellita hasta donde creas.",
+  sub:"Estirá la huellita desde el punto rosa.",
   init:function(){ return 8.0; },
   label:function(v){ return v.toFixed(1).replace(".",",")+" cm"; },
   short:function(v){ return v.toFixed(1).replace(".",",")+" cm"; },
@@ -895,7 +891,7 @@ var Q = [
 },
 {
   id:"trabajo", title:"¿Cuántas horas de trabajo de parto?",
-  sub:"Deslizá el dedo por las horas. Cero si es cesárea programada.",
+  sub:"Deslizá. Cero si es cesárea programada.",
   init:function(){ return 8; },
   label:function(v){ return v===0?"Sin trabajo de parto":(v+(v===1?" hora":" horas")); },
   short:function(v){ return v+" h"; },
@@ -906,7 +902,6 @@ var Q = [
       var i=el("i"); i.style.height=(26+h*2)+"%"; bar.appendChild(i); cells.push(i);
     }
     stage.appendChild(bar);
-    stage.appendChild(el("p","hintline","Deslizá de izquierda a derecha"));
     function draw(){ cells.forEach(function(c,i){ c.classList.toggle("on", i<get()); }); }
     dragTrack(bar,{min:0,max:24,step:1,set:function(v){ set(v); draw(); }});
     draw();
@@ -914,7 +909,7 @@ var Q = [
 },
 {
   id:"sangre", title:"¿Qué grupo sanguíneo?",
-  sub:"Elegí el grupo y después el factor. Casi nadie la piensa y sale en la clínica.",
+  sub:"El grupo, y después el factor.",
   init:function(){ return 0; },
   label:function(v){ return SANGRE_L[v>>1]+SANGRE_F[v&1]; },
   short:function(v){ return SANGRE_L[v>>1]+SANGRE_F[v&1]; },
@@ -971,18 +966,22 @@ var Q = [
 var TOTAL_MAX = Q.length*100;
 
 // En castellano lo que las funciones score() hacen con numeros. Si cambia una
-// formula, cambia tambien el texto de al lado: los lee la gente que apuesta.
-var REGLAS = {
-  fecha:   "Perdés 12 puntos por cada día de diferencia. A 8 días o más, cero.",
-  hora:    "Baja parejo hasta llegar a cero con 6 horas de diferencia.",
-  peso:    "Baja parejo hasta llegar a cero con 900 gramos de diferencia.",
-  ojos:    "O acertás o no: 100 o nada.",
-  altura:  "Baja parejo hasta llegar a cero con 9 cm de diferencia.",
-  parto:   "O acertás o no: 100 o nada.",
-  pie:     "Baja parejo hasta llegar a cero con 1,5 cm de diferencia.",
-  trabajo: "Baja parejo hasta llegar a cero con 12 horas de diferencia.",
-  sangre:  "100 con grupo y factor. 45 si acertás solo el grupo (0, A, B o AB)."
-};
+// formula, cambia tambien el renglon de al lado: los lee la gente que apuesta.
+var PUNTOS = [
+  { grupo:"Cuanto más cerca, más puntos", filas:[
+    ["Día",              "−12 por día"],
+    ["Hora",             "cero a las 6 h"],
+    ["Peso",             "cero a los 900 g"],
+    ["Altura",           "cero a los 9 cm"],
+    ["Pie",              "cero a 1,5 cm"],
+    ["Trabajo de parto", "cero a las 12 h"]
+  ]},
+  { grupo:"O acertás o no", filas:[
+    ["Ojos",            "100 o nada"],
+    ["Parto",           "100 o nada"],
+    ["Grupo sanguíneo", "45 si acertás solo el grupo"]
+  ]}
+];
 
 function scoreBet(resp, real){
   var total=0;
@@ -1019,9 +1018,7 @@ $("btnOpen").addEventListener("click",function(){ confetti(20); show("s-register
 function checkReg(){
   var ok = me.nombre.length>=2 && me.parentesco.length>=2;
   $("btnToDeck").disabled=!ok;
-  $("regNote").textContent = ok
-    ? "Perfecto, "+me.nombre+". Te esperan "+Q.length+" apuestas."
-    : "Completá los dos campos para seguir.";
+  $("regNote").textContent = ok ? "" : "Faltan los dos datos.";
   lsSet(LS_DRAFT,me);
 }
 $("regName").addEventListener("input",function(e){ me.nombre=e.target.value.trim(); checkReg(); });
@@ -1032,6 +1029,12 @@ $("btnToDeck").addEventListener("click",function(){
 
 /* ===================== el mazo ===================== */
 var idx=0, tempVal=null, card=$("card");
+
+// Los unicos juegos que se arrastran. Solo ellos frenan el deslizar de la
+// tarjeta: el aire alrededor del widget, y los que se resuelven tocando, dejan
+// pasar el gesto. Si frenara el escenario entero, para agarrar la tarjeta
+// quedaria una franja finita arriba y otra abajo.
+var ARRASTRABLES=".clock,.ruler,.tape,.foot,.hourbar";
 
 function renderDots(){
   var dots=$("dots"); dots.innerHTML="";
@@ -1066,7 +1069,9 @@ function renderCard(i){
   card.appendChild(el("p","card-sub", deckMode==="real" ? "Cargá cómo fue de verdad." : q.sub));
 
   var stage=el("div","stage");
-  stage.addEventListener("pointerdown",function(e){ e.stopPropagation(); });
+  stage.addEventListener("pointerdown",function(e){
+    if(e.target.closest && e.target.closest(ARRASTRABLES)) e.stopPropagation();
+  });
   card.appendChild(stage);
 
   var foot=el("div","card-foot");
@@ -1105,7 +1110,7 @@ function renderFinalCard(){
   var stage=el("div","stage");
   stage.style.justifyContent="flex-start";
   stage.style.overflowY="auto";
-  stage.addEventListener("pointerdown",function(e){ e.stopPropagation(); });
+  stage.style.touchAction="pan-y";
   var dl=el("dl");
   dl.style.cssText="margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:13px;width:100%";
   Q.forEach(function(q){
@@ -1182,8 +1187,10 @@ document.addEventListener("keydown",function(e){
   card.addEventListener("pointermove",function(e){
     if(!on) return;
     var dx=e.clientX-sx, dy=e.clientY-sy;
-    if(Math.abs(dx)<6 && Math.abs(dy)<6) return;
-    if(!moved && Math.abs(dy)>Math.abs(dx)){ on=false; return; }
+    if(Math.abs(dx)<5 && Math.abs(dy)<5) return;
+    // Solo se abandona si el gesto es claramente vertical: un deslizar de
+    // pulgar casi nunca sale recto, y un 1:1 descartaba demasiados.
+    if(!moved && Math.abs(dy)>Math.abs(dx)*1.5){ on=false; return; }
     moved=true;
     card.style.transform="translateX("+dx+"px) rotate("+(dx/22)+"deg)";
     card.style.opacity=String(Math.max(.45,1-Math.abs(dx)/520));
@@ -1191,7 +1198,7 @@ document.addEventListener("keydown",function(e){
   function end(e){
     if(!on) return; on=false;
     var dx=e.clientX-sx;
-    if(moved && Math.abs(dx)>64){
+    if(moved && Math.abs(dx)>50){
       card.style.transform=""; card.style.opacity="";
       go(dx<0?1:-1);
       return;
@@ -1254,22 +1261,15 @@ function pintarBoleta(){
   });
 
   var lista=$("ptsList"); lista.innerHTML="";
-  Q.forEach(function(q){
-    var it=el("div","pts-item");
-    it.appendChild(el("b","","100 pts"));
-    var d=el("div");
-    d.appendChild(el("i","",sinSignos(q.title)));
-    d.appendChild(el("span","",REGLAS[q.id]||""));
-    it.appendChild(d);
-    lista.appendChild(it);
+  PUNTOS.forEach(function(g){
+    lista.appendChild(el("p","pts-grupo",g.grupo));
+    g.filas.forEach(function(f){
+      var fila=el("div","pts-fila");
+      fila.appendChild(el("b","",f[0]));
+      fila.appendChild(el("span","",f[1]));
+      lista.appendChild(fila);
+    });
   });
-  var tot=el("div","pts-item");
-  tot.appendChild(el("b","",TOTAL_MAX+" pts"));
-  var dt=el("div");
-  dt.appendChild(el("i","","Todo junto"));
-  dt.appendChild(el("span","","Se suman las nueve. Los tres puntajes más altos arman el podio."));
-  tot.appendChild(dt);
-  lista.appendChild(tot);
 }
 
 $("btnVerBoleta").addEventListener("click",function(){ show("s-boleta"); });
@@ -1368,7 +1368,7 @@ function pintarBetsHost(){
     : hostBets.length+(hostBets.length===1?" apuesta recibida.":" apuestas recibidas.");
   var list=$("betsList"); list.innerHTML="";
   if(!hostBets.length){
-    list.appendChild(el("div","empty","Mandá el link de abajo por WhatsApp y las apuestas van cayendo acá solas."));
+    list.appendChild(el("div","empty","Mandá el link de abajo y van cayendo solas."));
     return;
   }
   var box=el("div","card-box"); box.style.padding="4px 2px";
@@ -1397,7 +1397,7 @@ function pintarRealHost(){
   s.style.cssText="display:flex;flex-direction:column;gap:12px";
   realDraft = estado.real ? Object.assign({},estado.real) : {};
   if(!realCompleto(estado.real)){
-    s.appendChild(el("div","empty","Todavía no cargaste los datos reales. Sin esto no hay podio."));
+    s.appendChild(el("div","empty","Sin esto no hay podio."));
     $("btnLoadReal").textContent="Cargar los datos reales";
     return;
   }
@@ -1428,7 +1428,7 @@ function pintarRealHost(){
   });
   s.appendChild(borrar);
 
-  s.appendChild(el("p","note","Borrarlos reabre las apuestas y esconde el podio. Las apuestas de la gente no se tocan."));
+  s.appendChild(el("p","note","Reabre las apuestas y esconde el podio. No toca las apuestas de la gente."));
 }
 
 $("btnLoadReal").addEventListener("click",function(){
@@ -1462,7 +1462,7 @@ function pintarTopHost(){
   var wrap=$("topWrap"); wrap.innerHTML="";
   if(!realCompleto(estado.real)){
     $("topSub").textContent="Todavía no se puede calcular.";
-    wrap.appendChild(el("div","empty","Cargá los datos reales en la pestaña “Nació” y el podio aparece solo."));
+    wrap.appendChild(el("div","empty","Cargá los datos en “Nació” y el podio sale solo."));
     return;
   }
   if(!hostBets.length){
@@ -1519,15 +1519,15 @@ function portada(j){
     checkReg();
   }
   if(j && j.cerrado){
-    $("coverCount").textContent="Adolfina ya nació: las apuestas están cerradas.";
+    $("coverCount").textContent="Adolfina ya nació. Apuestas cerradas.";
     $("btnOpen").disabled=true;
     $("btnOpen").style.opacity=".45";
     $("btnOpen").style.animation="none";
   }else{
     var n=(j && j.total)||0;
     $("coverCount").textContent = n>0
-      ? (n===1 ? "Ya apostó 1 persona." : "Ya apostaron "+n+" personas.")
-      : "Sé la primera persona en apostar.";
+      ? (n===1 ? "Ya apostó 1." : "Ya apostaron "+n+".")
+      : "Nadie apostó todavía.";
   }
   show("s-cover");
 }
