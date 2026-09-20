@@ -128,11 +128,46 @@ textarea{font-family:var(--mono);font-size:13px;line-height:1.7;resize:vertical}
 .readout{font-family:var(--display);font-size:clamp(24px,7.4vw,33px);font-weight:600;
   text-align:center;color:var(--gold-soft);line-height:1.1}
 .hintline{font-size:12.5px;color:var(--muted);text-align:center}
-.swipehint{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px}
-.arrow{width:46px;height:46px;border-radius:50%;border:1px solid var(--line-strong);
-  background:transparent;display:grid;place-items:center;font-size:19px;flex:0 0 46px}
-.arrow:disabled{opacity:.25;cursor:not-allowed}
-.swipehint span{font-size:12px;color:var(--muted);text-align:center;flex:1}
+/* ---------- pantalla final ---------- */
+.done{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center}
+.done-seal{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 34% 30%,#A9C9B4,var(--sage) 62%,#5F7E69);
+  color:#1B2A20;font-size:42px;line-height:1;
+  box-shadow:0 14px 30px -12px rgba(143,179,155,.75)}
+.done h2{font-size:clamp(30px,9vw,42px);font-variation-settings:"SOFT" 40}
+.done p{color:var(--muted);font-size:15px;max-width:26ch}
+
+/* ---------- la boleta ---------- */
+.tk{background:linear-gradient(168deg,#FAF1E6,#EEE0CF);color:#2B1220;border-radius:16px;
+  position:relative;box-shadow:0 22px 44px -20px rgba(0,0,0,.85)}
+.tk-top{padding:20px 20px 14px;text-align:center}
+.tk-kicker{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:#A3738A}
+.tk-name{font-family:var(--display);font-size:25px;font-weight:600;line-height:1.1;margin-top:7px}
+.tk-rel{font-size:13px;color:#7A5566;margin-top:3px}
+.tk-perf{position:relative;height:20px}
+.tk-perf::before,.tk-perf::after{content:"";position:absolute;top:50%;width:20px;height:20px;
+  border-radius:50%;background:#3B1B2C;transform:translateY(-50%)}
+.tk-perf::before{left:-10px}
+.tk-perf::after{right:-10px}
+.tk-cut{position:absolute;left:14px;right:14px;top:50%;border-top:2px dashed rgba(43,18,32,.26)}
+.tk-body{padding:2px 20px 16px}
+.tk-row{display:flex;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px solid rgba(43,18,32,.1)}
+.tk-row:last-child{border-bottom:0}
+.tk-q{font-size:13px;color:#6E4A5C;flex:1;min-width:0}
+.tk-v{font-family:var(--mono);font-size:13px;font-weight:700;text-align:right}
+.tk-pts{font-family:var(--mono);font-size:10px;color:#AC8B9D;flex:0 0 42px;text-align:right}
+.tk-foot{padding:13px 20px;background:rgba(43,18,32,.07);border-radius:0 0 16px 16px;
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--mono);font-size:11px;color:#6E4A5C}
+.tk-foot b{color:#2B1220}
+
+/* ---------- como se puntua ---------- */
+.pts-item{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.pts-item:last-child{border-bottom:0}
+.pts-item b{font-family:var(--mono);color:var(--gold);font-size:11.5px;flex:0 0 54px}
+.pts-item div{flex:1;min-width:0}
+.pts-item i{display:block;font-style:normal;color:var(--cream);font-weight:500}
+.pts-item span{color:var(--muted);font-size:12.5px}
 
 /* ---------- widgets ---------- */
 .cal{width:100%;max-width:330px;display:flex;flex-direction:column;gap:9px}
@@ -333,27 +368,50 @@ textarea{font-family:var(--mono);font-size:13px;line-height:1.7;resize:vertical}
     <div class="shadowcard"></div>
     <div class="card" id="card"></div>
   </div>
-  <div class="swipehint">
-    <button class="arrow" id="btnPrev" aria-label="Apuesta anterior">‹</button>
-    <span id="swipeMsg">Deslizá la tarjeta para pasar a la siguiente</span>
-    <button class="arrow" id="btnNext" aria-label="Apuesta siguiente">›</button>
-  </div>
 </section>
 
 <!-- ============ LISTO ============ -->
 <section class="screen" id="s-done" hidden>
+  <div class="done">
+    <div class="done-seal">✓</div>
+    <h2 id="doneTitle">Listo</h2>
+    <p id="doneSub">Tu apuesta quedó guardada.</p>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <button class="btn btn-gold" id="btnVerBoleta">Ver mi boleta</button>
+    <button class="btn btn-ghost" id="btnShare">Invitar a alguien más</button>
+  </div>
+</section>
+
+<!-- ============ BOLETA ============ -->
+<section class="screen" id="s-boleta" hidden>
+  <div class="topbar">
+    <button class="backlink" id="btnBoletaBack">← Volver</button>
+    <span class="eyebrow">Tu boleta</span>
+  </div>
+
+  <div class="tk">
+    <div class="tk-top">
+      <p class="tk-kicker">La quiniela de Adolfina</p>
+      <h2 class="tk-name" id="tkName"></h2>
+      <p class="tk-rel" id="tkRel"></p>
+    </div>
+    <div class="tk-perf"><div class="tk-cut"></div></div>
+    <div class="tk-body" id="tkBody"></div>
+    <div class="tk-foot">
+      <span id="tkSerial"></span>
+      <span><b id="tkTotal"></b> puntos en juego</span>
+    </div>
+  </div>
+
   <div>
-    <p class="eyebrow">Apuesta registrada</p>
-    <h2 class="card-title" style="font-size:clamp(26px,7.4vw,34px)" id="doneTitle">¡Listo!</h2>
-    <p class="lede" style="margin-top:8px">Ya le llegó a la organizadora. Cuando Adolfina nazca se calcula el podio solo.</p>
+    <h3 style="font-size:19px">Cómo se cuentan los puntos</h3>
+    <p class="note" style="margin:6px 0 4px">
+      Cada apuesta vale <b>hasta 100</b>. No hace falta acertar justo: cuanto más
+      cerca estés, más puntos te llevás. Al final se suman las nueve.
+    </p>
+    <div id="ptsList"></div>
   </div>
-  <div class="ticket">
-    <p class="eyebrow">Tu boleta</p>
-    <h3 style="font-size:21px;margin-top:4px" id="doneWho"></h3>
-    <dl id="doneList"></dl>
-  </div>
-  <button class="btn btn-gold" id="btnShare">Invitar a alguien más</button>
-  <p class="note" id="doneNote"></p>
 </section>
 
 <!-- ============ PODIO PÚBLICO ============ -->
@@ -912,6 +970,20 @@ var Q = [
 ];
 var TOTAL_MAX = Q.length*100;
 
+// En castellano lo que las funciones score() hacen con numeros. Si cambia una
+// formula, cambia tambien el texto de al lado: los lee la gente que apuesta.
+var REGLAS = {
+  fecha:   "Perdés 12 puntos por cada día de diferencia. A 8 días o más, cero.",
+  hora:    "Baja parejo hasta llegar a cero con 6 horas de diferencia.",
+  peso:    "Baja parejo hasta llegar a cero con 900 gramos de diferencia.",
+  ojos:    "O acertás o no: 100 o nada.",
+  altura:  "Baja parejo hasta llegar a cero con 9 cm de diferencia.",
+  parto:   "O acertás o no: 100 o nada.",
+  pie:     "Baja parejo hasta llegar a cero con 1,5 cm de diferencia.",
+  trabajo: "Baja parejo hasta llegar a cero con 12 horas de diferencia.",
+  sangre:  "100 con grupo y factor. 45 si acertás solo el grupo (0, A, B o AB)."
+};
+
 function scoreBet(resp, real){
   var total=0;
   for(var i=0;i<Q.length;i++){
@@ -926,7 +998,7 @@ function realCompleto(real){
 }
 
 /* ===================== navegación ===================== */
-var SCREENS=["s-boot","s-cover","s-register","s-deck","s-done","s-podio","s-host"];
+var SCREENS=["s-boot","s-cover","s-register","s-deck","s-done","s-boleta","s-podio","s-host"];
 function show(id){
   SCREENS.forEach(function(s){ $(s).hidden=(s!==id); });
   window.scrollTo(0,0);
@@ -971,8 +1043,6 @@ function renderDots(){
     dots.appendChild(d);
   }
   $("deckCount").textContent = (idx<Q.length ? (idx+1) : Q.length)+"/"+Q.length;
-  $("btnPrev").disabled = (idx===0);
-  $("btnNext").disabled = (idx>=Q.length);
 }
 
 function renderCard(i){
@@ -1092,8 +1162,15 @@ function go(dir){
     });
   },250);
 }
-$("btnPrev").addEventListener("click",function(){ go(-1); });
-$("btnNext").addEventListener("click",function(){ go(1); });
+// Se pasa de tarjeta con el dedo. Las flechas del teclado quedan para quien
+// navega sin poder arrastrar; no se anuncian porque en el celular no existen.
+document.addEventListener("keydown",function(e){
+  if($("s-deck").hidden) return;
+  var t=e.target;
+  if(t && (t.tagName==="INPUT" || t.tagName==="TEXTAREA")) return;
+  if(e.key==="ArrowRight") go(1);
+  else if(e.key==="ArrowLeft") go(-1);
+});
 
 /* swipe del mazo */
 (function(){
@@ -1150,16 +1227,53 @@ function enviarApuesta(){
     });
 }
 
-function pintarBoleta(){
-  $("doneWho").textContent=me.nombre+" · "+me.parentesco;
-  var dl=$("doneList"); dl.innerHTML="";
-  Q.forEach(function(q){
-    dl.appendChild(el("dt","",q.title.replace(/^¿|\?$/g,"")));
-    dl.appendChild(el("dd","", me.a[q.id]!=null ? q.short(me.a[q.id]) : "—"));
-  });
-  $("doneTitle").textContent="Quedó cerrada, "+me.nombre.split(" ")[0];
-  $("doneNote").textContent="Guardamos tu apuesta en este teléfono también. Si volvés a entrar con este link, vas a ver tu boleta.";
+/** Numero de boleta: estable para la misma persona, sin consultar al servidor. */
+function serie(b){
+  var s=(b.nombre+"|"+b.parentesco).toLowerCase(), h=0;
+  for(var i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0;
+  return String(h%100000).padStart(5,"0");
 }
+function sinSignos(t){ return t.replace(/^¿|\?$/g,""); }
+
+function pintarBoleta(){
+  $("doneTitle").textContent="Listo, "+me.nombre.split(" ")[0];
+  $("doneSub").textContent="Tu apuesta quedó guardada.";
+
+  $("tkName").textContent=me.nombre;
+  $("tkRel").textContent=me.parentesco;
+  $("tkSerial").textContent="Boleta Nº "+serie(me);
+  $("tkTotal").textContent=TOTAL_MAX;
+
+  var body=$("tkBody"); body.innerHTML="";
+  Q.forEach(function(q){
+    var row=el("div","tk-row");
+    row.appendChild(el("span","tk-q",sinSignos(q.title)));
+    row.appendChild(el("span","tk-v", me.a[q.id]!=null ? q.short(me.a[q.id]) : "—"));
+    row.appendChild(el("span","tk-pts","100"));
+    body.appendChild(row);
+  });
+
+  var lista=$("ptsList"); lista.innerHTML="";
+  Q.forEach(function(q){
+    var it=el("div","pts-item");
+    it.appendChild(el("b","","100 pts"));
+    var d=el("div");
+    d.appendChild(el("i","",sinSignos(q.title)));
+    d.appendChild(el("span","",REGLAS[q.id]||""));
+    it.appendChild(d);
+    lista.appendChild(it);
+  });
+  var tot=el("div","pts-item");
+  tot.appendChild(el("b","",TOTAL_MAX+" pts"));
+  var dt=el("div");
+  dt.appendChild(el("i","","Todo junto"));
+  dt.appendChild(el("span","","Se suman las nueve. Los tres puntajes más altos arman el podio."));
+  tot.appendChild(dt);
+  lista.appendChild(tot);
+}
+
+$("btnVerBoleta").addEventListener("click",function(){ show("s-boleta"); });
+$("btnBoletaBack").addEventListener("click",function(){ show("s-done"); });
 
 $("btnShare").addEventListener("click",function(){
   var url=location.origin+location.pathname;
@@ -1280,6 +1394,7 @@ function pintarBetsHost(){
 
 function pintarRealHost(){
   var s=$("realSummary"); s.innerHTML="";
+  s.style.cssText="display:flex;flex-direction:column;gap:12px";
   realDraft = estado.real ? Object.assign({},estado.real) : {};
   if(!realCompleto(estado.real)){
     s.appendChild(el("div","empty","Todavía no cargaste los datos reales. Sin esto no hay podio."));
@@ -1291,11 +1406,29 @@ function pintarRealHost(){
   t.appendChild(el("p","eyebrow","Datos cargados"));
   var dl=el("dl");
   Q.forEach(function(q){
-    dl.appendChild(el("dt","",q.title.replace(/^¿|\?$/g,"")));
+    dl.appendChild(el("dt","",sinSignos(q.title)));
     dl.appendChild(el("dd","",q.short(estado.real[q.id])));
   });
   t.appendChild(dl);
   s.appendChild(t);
+
+  var borrar=el("button","btn btn-ghost","Borrar los datos reales");
+  borrar.type="button";
+  borrar.style.color="var(--rose)";
+  borrar.addEventListener("click",function(){
+    if(!confirm("¿Borrar los datos reales?\n\nSe baja el podio y las apuestas se vuelven a abrir.")) return;
+    borrar.disabled=true;
+    api({ op:"admin", token:TOKEN, sub:"borrar_resultado" })
+      .then(function(){
+        estado.real=null; estado.publicado=false; realDraft={};
+        cargarHost();
+        toast("Listo: sin datos reales y apuestas abiertas de nuevo.",3600);
+      })
+      .catch(function(e){ borrar.disabled=false; toast(e.message,4000); });
+  });
+  s.appendChild(borrar);
+
+  s.appendChild(el("p","note","Borrarlos reabre las apuestas y esconde el podio. Las apuestas de la gente no se tocan."));
 }
 
 $("btnLoadReal").addEventListener("click",function(){
@@ -1369,6 +1502,35 @@ function pintarTopHost(){
 }
 
 /* ===================== arranque ===================== */
+function olvidarApuesta(){
+  lsDel(LS_MINE); lsDel(LS_DRAFT);
+  me={ nombre:"", parentesco:"", a:{}, secreto:"" };
+  $("regName").value=""; $("regRel").value="";
+  checkReg();
+}
+
+function portada(j){
+  var draft=lsGet(LS_DRAFT);
+  if(draft){
+    me={ nombre:draft.nombre||"", parentesco:draft.parentesco||"", a:draft.a||{}, secreto:draft.secreto||"" };
+    $("regName").value=me.nombre;
+    $("regRel").value=me.parentesco;
+    checkReg();
+  }
+  if(j && j.cerrado){
+    $("coverCount").textContent="Adolfina ya nació: las apuestas están cerradas.";
+    $("btnOpen").disabled=true;
+    $("btnOpen").style.opacity=".45";
+    $("btnOpen").style.animation="none";
+  }else{
+    var n=(j && j.total)||0;
+    $("coverCount").textContent = n>0
+      ? (n===1 ? "Ya apostó 1 persona." : "Ya apostaron "+n+" personas.")
+      : "Sé la primera persona en apostar.";
+  }
+  show("s-cover");
+}
+
 function boot(){
   if(TOKEN){
     var url=location.origin+location.pathname;
@@ -1395,29 +1557,31 @@ function boot(){
         return;
       }
 
+      // La boleta guardada en este navegador puede estar mintiendo: la
+      // organizadora pudo borrar esa apuesta del servidor. Preguntamos si
+      // sigue viva antes de mostrarla, y si no, nos olvidamos de ella.
       var mine=lsGet(LS_MINE);
-      if(mine && mine.a){
-        me=mine;
-        pintarBoleta();
-        show("s-done");
+      if(mine && mine.a && mine.secreto){
+        api({ op:"mia", nombre:mine.nombre, parentesco:mine.parentesco, secreto:mine.secreto })
+          .then(function(v){
+            if(v.existe){
+              me=mine;
+              if(v.respuestas) me.a=v.respuestas;
+              pintarBoleta();
+              show("s-done");
+            }else{
+              olvidarApuesta();
+              portada(j);
+            }
+          })
+          .catch(function(){ me=mine; pintarBoleta(); show("s-done"); });
         return;
       }
-
-      var draft=lsGet(LS_DRAFT);
-      if(draft){
-        me={ nombre:draft.nombre||"", parentesco:draft.parentesco||"", a:draft.a||{}, secreto:draft.secreto||"" };
-        $("regName").value=me.nombre;
-        $("regRel").value=me.parentesco;
-        checkReg();
-      }
-      $("coverCount").textContent = estado.total>0
-        ? (estado.total===1 ? "Ya apostó 1 persona." : "Ya apostaron "+estado.total+" personas.")
-        : "Sé la primera persona en apostar.";
-      show("s-cover");
+      portada(j);
     })
     .catch(function(){
+      portada(null);
       $("coverCount").textContent="";
-      show("s-cover");
       toast("No me puedo conectar con el servidor. Probá recargar la página.",5000);
     });
 }
