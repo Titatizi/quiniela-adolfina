@@ -1163,8 +1163,12 @@ function go(dir){
     requestAnimationFrame(function(){
       card.style.transition="transform .3s cubic-bezier(.3,1.1,.4,1), opacity .3s ease";
       card.style.transform="none"; card.style.opacity="1";
-      navegando=false;
     });
+    // El candado se suelta aca y NO dentro del requestAnimationFrame: si la
+    // pestana deja de pintarse (pantalla bloqueada, app en segundo plano) ese
+    // callback no corre nunca y el mazo queda trabado hasta recargar. A esta
+    // altura renderCard ya movio idx, asi que soltarlo es seguro.
+    navegando=false;
   },250);
 }
 // Se pasa de tarjeta con el dedo. Las flechas del teclado quedan para quien
