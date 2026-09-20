@@ -140,10 +140,12 @@ textarea{font-family:var(--mono);font-size:13px;line-height:1.7;resize:vertical}
 .cal-head b{font-family:var(--display);font-size:16px;font-weight:600;text-transform:capitalize}
 .cal-nav{width:34px;height:34px;border-radius:50%;border:1px solid var(--line-strong);background:transparent;display:grid;place-items:center}
 .cal-nav:disabled{opacity:.25;cursor:not-allowed}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
-.cal-dow{font-family:var(--mono);font-size:10px;text-align:center;color:var(--muted)}
+/* minmax(0,1fr) y no 1fr: con aspect-ratio, el minimo automatico de la grilla
+   hace que las siete columnas no puedan achicarse y la ultima quede cortada. */
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+.cal-dow{font-family:var(--mono);font-size:10px;text-align:center;color:var(--muted);min-width:0}
 .cal-day{aspect-ratio:1;border:0;border-radius:9px;background:rgba(250,241,230,.08);color:var(--cream);
-  font-size:13px;font-family:var(--mono);display:grid;place-items:center;
+  font-size:13px;font-family:var(--mono);display:grid;place-items:center;min-width:0;padding:0;
   transition:transform .16s cubic-bezier(.3,1.4,.5,1),background .16s}
 .cal-day.empty{background:none;pointer-events:none}
 .cal-day.due{box-shadow:inset 0 0 0 1px var(--gold)}
@@ -1065,9 +1067,15 @@ function renderFinalCard(){
   card.appendChild(foot);
 }
 
+// Sin este cerrojo, dos toques seguidos en la flecha avanzan una sola tarjeta:
+// el segundo entra mientras idx todavia no se movio y calcula el mismo destino.
+var navegando=false;
+
 function go(dir){
+  if(navegando) return;
   var next=clamp(idx+dir,0,Q.length);
   if(next===idx) return;
+  navegando=true;
   var sign = dir>0 ? -1 : 1;
   card.style.transition="transform .26s ease, opacity .26s ease";
   card.style.transform="translateX("+(sign*window.innerWidth)+"px) rotate("+(sign*12)+"deg)";
@@ -1080,6 +1088,7 @@ function go(dir){
     requestAnimationFrame(function(){
       card.style.transition="transform .3s cubic-bezier(.3,1.1,.4,1), opacity .3s ease";
       card.style.transform="none"; card.style.opacity="1";
+      navegando=false;
     });
   },250);
 }
